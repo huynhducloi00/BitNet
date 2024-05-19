@@ -1,14 +1,17 @@
-#include <torch/extension.h>
-#include <ATen/ATen.h>
-#include <ATen/cuda/CUDAContext.h>
-
+#include "gemm_lowbit_kernel.h"
+// #include <iostream>
+// using namespace std;
 // Simplified definition of a low-precision data type (e.g., FP8)
 // This is purely illustrative. Actual FP8 implementation will vary and might require custom handling.
-typedef half fp8;
+typedef at::Half fp8;
 
 // CUDA kernel for a simplified low-precision GEMM operation.
 // This version assumes the inputs are already in the desired low-precision format.
 __global__ void gemm_lowbit_kernel(fp8 *a, fp8 *b, fp8 *c, int M, int N, int K) {
+    float mot=1.2;
+    double hai=2.3;
+    auto mot1=__float2half(mot);
+    auto hai1=__double2half(hai);
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -28,7 +31,9 @@ void gemm_lowbit(at::Tensor a, at::Tensor b, at::Tensor c, float w_scale, float 
     const auto M = a.size(0);
     const auto K = a.size(1);
     const auto N = b.size(1);
-
+    // std::cout<<"bt"<< sizeof(a[0][0].item());
+    // std::cout<<"float"<< sizeof(a[0][0].item<float>());
+    // std::cout<<"half"<< sizeof(a[0][0].item<fp8>());
     // Define the number of threads per block and the number of blocks per grid
     dim3 threads(16, 16);
     dim3 blocks((N + threads.x - 1) / threads.x, (M + threads.y - 1) / threads.y);

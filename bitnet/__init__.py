@@ -22,3 +22,4 @@ __all__ = [
     "BitMamba",
     "BitMoE",
 ]
+__version__=1.0
